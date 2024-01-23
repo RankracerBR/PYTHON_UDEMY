@@ -9,6 +9,13 @@ NOVA_PASTA = '***'
 os.makedirs(NOVA_PASTA)
 print(DESKTOP)
 
+os.unlink(NOVA_PASTA)
+shutil.rmtree(NOVA_PASTA, ignore_errors=True)
+shutil.copytree(PASTA_ORIGINAL, NOVA_PASTA)
+shutil.copytree(PASTA_ORIGINAL, NOVA_PASTA)
+shutil.move(NOVA_PASTA, NOVA_PASTA + '_EITA')
+
+
 for root, dirs, files in os.walk(PASTA_ORIGINAL):
     for dir_ in dirs:
         caminho_novo_diretorio = os.path.join(
