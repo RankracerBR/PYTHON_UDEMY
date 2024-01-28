@@ -1,11 +1,18 @@
-import time
+from secrets import SystemRandom as Sr
 import random
+import string as s
+import time
 
-#random.seed(0)
+print(''.join(Sr().choices(s.ascii_letters + s.digits + s.punctuation, k=64)))
+
+#random = secrets.SystemRandom()
+
+# print(secrets.randbelow(100))
+# print(secrets.choice([10,11,12]))
 
 r_range = random.randrange(1,20,2)
 print(r_range)
-
+s
 r_uniform = random.uniform(10,20)
 print(r_uniform)
 
@@ -25,3 +32,4 @@ print(random.choice(novos_nomes))
 
 random.seed(time.time())
 print(time.time())
+
