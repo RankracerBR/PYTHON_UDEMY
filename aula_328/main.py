@@ -1,4 +1,4 @@
-from PyPDF2 import PdfReader, PdfWriter
+from PyPDF2 import PdfMerger, PdfReader, PdfWriter, PdfFileMerger
 from pathlib import Path
 
 
@@ -29,3 +29,14 @@ for i, page in enumerate(reader.pages):
     with open(PASTA_NOVA / f'page{i}.pdf', 'wb') as arquivo:
         writer.add_page(page)
         writer.write(arquivo) # type: ignore
+
+
+files = [
+    PASTA_NOVA / f'page0.pdf'
+]
+merger = PdfMerger()
+for file in files:
+    merger.append(file)
+
+merger.write(PASTA_NOVA / 'MERGED.pdf')
+merger.close()

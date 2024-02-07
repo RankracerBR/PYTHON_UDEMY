@@ -1,6 +1,11 @@
+# type: ignore
 from pathlib import Path
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.wait import WebDriverWait
 import time
 
 #Chrome options (search site)
@@ -28,10 +33,24 @@ def make_chrome_browser(*options: str) -> webdriver.Chrome:
 
 
 if __name__ == '__main__':
+    TIME_TO_WAIT = 10
 
-    options = '--headless', '--disable-gpu',
+    options = ()
     browser = make_chrome_browser(*options)
 
     browser.get('https://www.google.com')
 
-    time.sleep(10)
+    search_input = WebDriverWait(browser, TIME_TO_WAIT).until(
+        EC.presence_of_element_located(
+            (By.NAME, 'q')
+        )
+    )
+
+    search_input.send_keys('Hello World!')
+    search_input.send_keys(Keys.ENTER)
+
+    results = browser.find_element(By.ID, 'search')
+    links = results.find_elements(By.TAG_NAME, 'a')
+    links[0].click()
+
+    time.sleep(TIME_TO_WAIT)
