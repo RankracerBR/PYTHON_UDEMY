@@ -1,9 +1,14 @@
 from PySide6.QtWidgets import QLineEdit
 from variables import BIG_FONT_SIZE, MINIMUN_WIDTH, TEXT_MARGIN
 from PySide6.QtCore import Qt
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from buttons import Button
+    from info import Info
 
 class Display(QLineEdit):
-    def __init__(self, *args, **kwargs):
+    def __init__(self,*args, **kwargs):
         super().__init__(*args, **kwargs)
         self.configstyle()
 

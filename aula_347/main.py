@@ -5,6 +5,7 @@ from PySide6.QtGui import QIcon
 from display import Display
 from info import Info
 from styles import setuptheme
+from buttons import Button, ButtonsGrid
 import sys
 
 def temp_label(texto):
@@ -28,14 +29,18 @@ if __name__ == '__main__':
     app.setWindowIcon(icon)
 
     # Info
-    info = Info('2.0 ^ 10.0')
+    info = Info('Sua Conta')
     window.addWidgetToVLayout(info)
 
     # Display
     display = Display()
-    display.setPlaceholderText('Digite algo')
     window.addWidgetToVLayout(display)
 
+    # Grid
+    buttonsgrid = ButtonsGrid(display, info)
+    window.vLayout.addLayout(buttonsgrid)
+    
     # Exec
+    window.adjustFixedSize()
     window.show()
     app.exec()
