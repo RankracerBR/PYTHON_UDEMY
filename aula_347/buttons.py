@@ -1,3 +1,4 @@
+from typing import TYPE_CHECKING
 from PySide6.QtWidgets import QPushButton, QGridLayout, QWidget
 from PySide6.QtCore import Slot
 from variables import MEDIUM_FONT_SIZE
@@ -5,6 +6,10 @@ from utils import isNumOrDot, isEmpty, isValidNumber
 from display import Display
 import math
 
+if TYPE_CHECKING:
+    from display import Display
+    from info import Info
+    from main_window import MainWindow
 
 class Button(QPushButton):
     def __init__(self, *args, **kwargs):
@@ -19,7 +24,8 @@ class Button(QPushButton):
         self.setCheckable(True)
 
 class ButtonsGrid(QGridLayout):
-    def __init__(self, display: Display, info, *args, **kwargs) -> None:
+    def __init__(self, display: Display, info: 'Info', window: 'MainWindow', 
+                 *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
         self._gridMask = [
@@ -31,6 +37,7 @@ class ButtonsGrid(QGridLayout):
         ]
         self.display = display
         self.info = info
+        self.window = window
         self._equation = ''
         self._equationInitialValue = 'Sua conta'
         self._left = None
@@ -47,7 +54,14 @@ class ButtonsGrid(QGridLayout):
         self._equation = value
         self.info.setText(value)
 
+    def vouApagarVoce(self):
+        print('Enter pressionado, sinal recebido por "vouApagarVoce" em', type(self).__name__)
+
     def _makeGrid(self):
+        self.display.eqPressed.connect(self.vouApagarVoce)
+        self.display.delPressed.connect(self.vouApagarVoce)
+        self.display.eqPressed.connect(self.vouApagarVoce)
+
         for row_number , row_data in enumerate(self._gridMask):
             for column_number, button_text in enumerate(row_data):
                 #print('Linha', row_number, 'Coluna', column_number, button_text)
@@ -66,7 +80,7 @@ class ButtonsGrid(QGridLayout):
 
     def _configSpecialButton(self, button):
         text = button.text()
-        
+
         if text == 'C':
             self._connectButtonClicked(button, self._clear)
             # button.clicked.connect(self.display.clear)
@@ -79,6 +93,8 @@ class ButtonsGrid(QGridLayout):
         
         if text in '=':
             self._connectButtonClicked(button, self._eq)
+        if text in 'D':
+            self._connectButtonClicked(button, self.display.backspace)
 
     def _makeSlot(self, func, *args, **kwargs):
         @Slot(bool)
@@ -109,7 +125,7 @@ class ButtonsGrid(QGridLayout):
         # Se a pessoa clicou no operador sem
         # confuigurar qualquer número
         if not isValidNumber(displayText) and self._left is None:
-            print('Não tem nada para colocar no valor da esquerda')
+            self._showError('Você não digitou nada.')
             return
 
         # Se houver algo no número da esquerda,
@@ -125,7 +141,7 @@ class ButtonsGrid(QGridLayout):
         displayText = self.display.text()
 
         if not isValidNumber(displayText):
-            print('Sem nada para a direita')
+            self._showError('Conta incompleta.')
             return
 
         self._right = float(displayText)
@@ -138,9 +154,9 @@ class ButtonsGrid(QGridLayout):
             else:
                 result = eval(self.equation) # eval() avalia uma string como código python, CUIDADO!
         except ZeroDivisionError:
-           print('Zero Division Error')
+           print('Divisão por zero.')
         except OverflowError:
-            print('Número muito grande')
+            print('Essa conta não pode ser realizada')
 
         self.display.clear()
         self.info.setText(f'{self.equation} = {result}')
@@ -149,3 +165,19 @@ class ButtonsGrid(QGridLayout):
 
         if result == 'error':
             self._left = None
+    
+    def _makeDialog(self, text):
+        msgBox = self.window.makeMsgBox()
+        msgBox.setText(text)
+        return msgBox
+
+
+    def _showError(self, text):
+        msgBox = self._makeDialog(text)
+        msgBox.setIcon(msgBox.Icon.Critical)
+        msgBox.exec()
+    
+    def _showInfo(self, text):
+        msgBox = self._makeDialog(text)
+        msgBox.setIcon(msgBox.Icon.Information)
+        msgBox.exec()
