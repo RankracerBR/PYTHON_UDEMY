@@ -5,7 +5,7 @@ from PySide6.QtGui import QIcon
 from display import Display
 from info import Info
 from styles import setuptheme
-from buttons import Button, ButtonsGrid
+from buttons import ButtonsGrid
 import sys
 
 def temp_label(texto):

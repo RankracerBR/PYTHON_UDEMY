@@ -3,11 +3,7 @@ from PySide6.QtWidgets import QLineEdit
 from utils import isEmpty, isNumOrDot
 from variables import BIG_FONT_SIZE, MINIMUN_WIDTH, TEXT_MARGIN
 from PySide6.QtCore import Qt, Signal
-from typing import TYPE_CHECKING
 
-if TYPE_CHECKING:
-    from buttons import Button
-    from info import Info
 
 class Display(QLineEdit):
     eqPressed = Signal()
@@ -15,7 +11,6 @@ class Display(QLineEdit):
     clearPressed = Signal()
     inputPressed = Signal(str)
     operatorPressed = Signal(str)
-
 
     def __init__(self,*args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -57,7 +52,7 @@ class Display(QLineEdit):
         if isOperator:
             if text.lower() == 'p':
                 text = '^'
-            self.operatorPressed.emit()
+            self.operatorPressed.emit(text)
             return event.ignore()    
 
         # Não passar daqui
