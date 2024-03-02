@@ -31,17 +31,52 @@ with connection:
 
     # Começo a manipular dados a partir daqui
     with connection.cursor() as cursor:
-        cursor.execute(
+        sql = (
             f'INSERT INTO {TABLE_NAME} '
-            '(nome, idade) VALUES ("Augusto", 20) '
+            '(nome, idade) '
+            'VALUES '
+            '(%(nome)s, %(age)s)'
         )
-        cursor.execute(
+        data2 = {
+            "nome": "Le",
+            "age": 37
+            }
+
+        result = cursor.execute(sql, data2)
+        print(sql, data2)
+        print(result)
+    connection.commit()
+
+        # Começo a manipular dados a partir daqui
+    with connection.cursor() as cursor:
+        sql = (
             f'INSERT INTO {TABLE_NAME} '
-            '(nome, idade) VALUES ("Augusto", 20) '
+            '(nome, idade) '
+            'VALUES '
+            '(%(name)s, %(age)s)'
         )
-        result = cursor.execute(
+        data3 = (
+            {"name": "Siri","age": 33, },
+            {"name": "Júlia","age": 21, },
+
+        )
+        result = cursor.executemany(sql, data3)
+        print(sql, data3)
+        print(result)
+    connection.commit()
+
+    with connection.cursor() as cursor:
+        sql = (
             f'INSERT INTO {TABLE_NAME} '
-            '(nome, idade) VALUES ("Augusto", 20) '
+            '(nome, idade) '
+            'VALUES '
+            '(%s, %s)'
         )
+        data4 = (
+            ("Siri", 22),
+            ("Helena", 15),
+        )
+        result = cursor.executemany(sql, data4)
+        print(sql, data4)
         print(result)
     connection.commit()
