@@ -1,3 +1,4 @@
+import pymysql.cursors
 import pymysql
 import dotenv
 import os
@@ -11,6 +12,7 @@ connection = pymysql.connect(
     user = os.environ['MYSQL_USER'],
     password = os.environ['MYSQL_PASSWORD'],
     database = os.environ['MYSQL_DATABASE'],
+    cursorclass=pymysql.cursors.DictCursor
 )
 
 print(os.environ['MYSQL_DATABASE'])
@@ -79,4 +81,52 @@ with connection:
         result = cursor.executemany(sql, data4)
         print(sql, data4)
         print(result)
+    connection.commit()
+
+    with connection.cursor() as cursor:
+        # menor_id = int(input('Digite o menor id: ')) # sql injection
+        # maior_id = int(input('Digite o maior id: '))
+        menor_id = 2
+        maior_id = 3
+
+        sql = (
+            f'SELECT * FROM {TABLE_NAME} '
+            'WHERE id BETWEEN %s AND %s '
+        )
+        cursor.execute(sql, (menor_id, maior_id))
+        data5 = cursor.fetchall()
+        
+        for row in data5:
+            print(row)
+
+    # Apagando com DELETE, WHERE e placeholders no PyMySQL
+    # with connection.cursor() as cursor:
+    #     sql = (
+    #         f'DELETE from {TABLE_NAME} ' # DELETAR ONDE (DELETE WHERE), ATUALIZAR ONDE(UPDATE WHERE)
+    #         'WHERE id = %s '
+    #     )
+    #     cursor.execute(sql)
+    #     connection.commit()
+
+    #     cursor.execute(f'SELECT * FROM {TABLE_NAME}')
+
+    #     for row in cursor.fetchall():
+    #         print(row)
+    
+    # Editando com UPDATE, WHERE e placeholders no PyMySQL
+    with connection.cursor() as cursor:
+        sql = (
+            f'UPDATE {TABLE_NAME} ' # DELETAR ONDE (DELETE WHERE), ATUALIZAR ONDE(UPDATE WHERE)
+            'SET nome=%s, idade=%s '
+            'WHERE id=%s '
+        )
+        cursor.execute(sql, ('Eleonor', 26, 4))
+        cursor.execute(f'SELECT * FROM {TABLE_NAME}')
+
+        # for row in cursor.fetchall():
+        #     _id, name, age = row.values()
+        #     print(_id, name, age)
+
+        for row in cursor.fetchall():
+            print(row)
     connection.commit()
