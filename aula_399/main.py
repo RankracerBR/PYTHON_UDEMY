@@ -1,3 +1,4 @@
+from typing import cast
 import pymysql.cursors
 import pymysql
 import dotenv
@@ -6,13 +7,15 @@ import os
 dotenv.load_dotenv()
 
 TABLE_NAME = 'customers'
+CURRENT_CURSOR = pymysql.cursors.DictCursor
 
 connection = pymysql.connect(
     host = os.environ['MYSQL_HOST'],
     user = os.environ['MYSQL_USER'],
     password = os.environ['MYSQL_PASSWORD'],
     database = os.environ['MYSQL_DATABASE'],
-    cursorclass=pymysql.cursors.DictCursor
+    charset='utf8mb4',
+    cursorclass=CURRENT_CURSOR
 )
 
 print(os.environ['MYSQL_DATABASE'])
@@ -115,18 +118,36 @@ with connection:
     
     # Editando com UPDATE, WHERE e placeholders no PyMySQL
     with connection.cursor() as cursor:
+        cursor = cast(CURRENT_CURSOR, cursor)
         sql = (
             f'UPDATE {TABLE_NAME} ' # DELETAR ONDE (DELETE WHERE), ATUALIZAR ONDE(UPDATE WHERE)
             'SET nome=%s, idade=%s '
             'WHERE id=%s '
         )
         cursor.execute(sql, ('Eleonor', 26, 4))
-        cursor.execute(f'SELECT * FROM {TABLE_NAME}')
+        resultFromSelect = cursor.execute(f'SELECT * FROM {TABLE_NAME}')
 
-        # for row in cursor.fetchall():
-        #     _id, name, age = row.values()
-        #     print(_id, name, age)
+        data6 = cursor.fetchall()
 
+        print()
+        print('For 1: ')
         for row in cursor.fetchall():
             print(row)
+        
+
+        cursor.execute(
+            f'SELECT id from {TABLE_NAME} ORDER BY id DESC LIMIT 1 '
+        )
+        lastIdFromSelect = cursor.fetchone()
+
+        print(lastIdFromSelect)
+
+        print('resultFromSelect', resultFromSelect)
+        print('rowcount', cursor.rowcount)
+        print('lastrowid', cursor.lastrowid)
+        print('lastrowid na mão', lastIdFromSelect)
+
+        # cursor.scroll(-1)
+        print('rownumber', cursor.rownumber)
+
     connection.commit()
